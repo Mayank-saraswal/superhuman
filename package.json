@@ -1,0 +1,15 @@
+{
+  "name": "@repo/corsair",
+  "version": "1.0.0",
+  "scripts": {},
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "corsair": "^0.1.75",
+    "dotenv": "^17.2.3",
+    "zod": "^4.3.5"
+  }
+}
