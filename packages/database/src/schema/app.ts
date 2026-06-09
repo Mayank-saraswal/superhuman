@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, jsonb, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, jsonb, uuid, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -9,9 +9,15 @@ export const users = pgTable("users", {
   clerkId: text("clerk_id").unique().notNull(),
   email: text("email").unique().notNull(),
   name: text("name"),
+  imageUrl: text("image_url"),
   plan: text("plan").default("free"),
+  corsairTenantId: text("corsair_tenant_id").unique(),
+  onboardingComplete: boolean("onboarding_complete").default(false),
   createdAt: timestamp("created_at").defaultNow(),
-});
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("clerk_id_idx").on(table.clerkId),
+]);
 
 export const usersRelations = relations(users, ({ many }) => ({
   emailSummaries: many(emailSummaries),
@@ -46,7 +52,7 @@ export const emailSummariesRelations = relations(emailSummaries, ({ one }) => ({
  */
 export const followUps = pgTable("follow_ups", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   gmailMessageId: text("gmail_message_id").notNull(),
   remindAt: timestamp("remind_at").notNull(),
   isSent: boolean("is_sent").default(false),
@@ -65,7 +71,7 @@ export const followUpsRelations = relations(followUps, ({ one }) => ({
  */
 export const snippets = pgTable("snippets", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   shortcut: text("shortcut").notNull(),
   title: text("title"),
   content: text("content").notNull(),
@@ -96,7 +102,7 @@ export const readReceipts = pgTable("read_receipts", {
  */
 export const docs = pgTable("docs", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   title: text("title").default("Untitled"),
   content: jsonb("content").default({}),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -114,7 +120,7 @@ export const docsRelations = relations(docs, ({ one }) => ({
  */
 export const databases = pgTable("databases", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").references(() => users.id),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   schema: jsonb("schema").default({}),
   createdAt: timestamp("created_at").defaultNow(),

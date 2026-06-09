@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./*"]
+      "~/*": ["./*"],
+      "@superhuman/services": ["../../packages/services/index.ts"],
+      "@superhuman/database": ["../../packages/database/src/index.ts"]
     },
     "plugins": [
       {
