@@ -1,5 +1,5 @@
 {
-  "name": "trpc-monorepo",
+  "name": "superhuman",
   "private": true,
   "scripts": {
     "build": "dotenv -- turbo build",
@@ -17,7 +17,7 @@
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "dotenv-cli": "^11.0.0"
