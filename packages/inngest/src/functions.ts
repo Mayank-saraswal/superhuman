@@ -1,6 +1,7 @@
 import { inngestClient as inngest } from "@superhuman/events";
 import { summarizeEmail, generateDraftReply } from "@superhuman/ai";
 import { getTenant } from "@superhuman/corsair";
+import { db, emailSummaries } from "@superhuman/database";
 
 /**
  * Handles incoming Gmail messages, summarizes them, and generates a draft reply.
@@ -26,10 +27,13 @@ export const onMessageReceived = inngest.createFunction(
     });
 
     await step.run("save-to-database", async () => {
-      // Mock saving to DB since the database package is not fleshed out yet.
-      console.log(`Saved email ${messageId} for tenant ${tenantId}`);
-      console.log(`Summary: ${summary}`);
-      console.log(`Draft: ${draft}`);
+      // tenantId from corsair maps to our user ID in this architecture
+      await db.insert(emailSummaries).values({
+        userId: tenantId,
+        gmailMessageId: messageId,
+        summary: summary,
+        draftReply: draft,
+      });
     });
   }
 );

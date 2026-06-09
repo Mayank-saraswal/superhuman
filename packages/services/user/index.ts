@@ -1,5 +1,5 @@
-import { db } from "@repo/database";
-import { usersTable } from "@repo/database/schema";
+import { db } from "@superhuman/database";
+import { users as usersTable } from "@superhuman/database";
 import { env } from "../env";
 import { googleOAuth2Client } from "../clients/google-oauth";
 import { GetAuthenticationMethodOutputSchema } from "./model";

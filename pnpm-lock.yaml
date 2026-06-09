@@ -315,6 +315,9 @@ importers:
       '@corsair-dev/slack':
         specifier: ^0.1.0
         version: 0.1.4(@types/node@22.15.3)(corsair@0.1.75)(zod@4.3.5)
+      '@superhuman/database':
+        specifier: workspace:*
+        version: link:../database
       '@superhuman/events':
         specifier: workspace:*
         version: link:../events
@@ -324,9 +327,6 @@ importers:
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
-      pg:
-        specifier: ^8.13.1
-        version: 8.16.3
       zod:
         specifier: ^4.3.5
         version: 4.3.5
@@ -337,9 +337,6 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
-      '@types/pg':
-        specifier: ^8.11.11
-        version: 8.16.0
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -447,6 +444,9 @@ importers:
       '@superhuman/corsair':
         specifier: workspace:*
         version: link:../corsair
+      '@superhuman/database':
+        specifier: workspace:*
+        version: link:../database
       '@superhuman/events':
         specifier: workspace:*
         version: link:../events
@@ -485,12 +485,12 @@ importers:
 
   packages/services:
     dependencies:
-      '@repo/database':
-        specifier: workspace:*
-        version: link:../database
       '@repo/logger':
         specifier: workspace:*
         version: link:../logger
+      '@superhuman/database':
+        specifier: workspace:*
+        version: link:../database
       google-auth-library:
         specifier: ^10.5.0
         version: 10.5.0

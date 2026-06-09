@@ -19,7 +19,12 @@ The entire `@superhuman/corsair` package has been successfully migrated from the
 - Removed the root `tsconfig.base.json`.
 - Configured all three packages (`corsair`, `ai`, and `inngest`) to extend from the central `@repo/typescript-config/base.json` configuration package to enforce workspace-wide TypeScript standards.
 
-## 4. AI & Inngest Integration
+## 4. Database Integration & Data Access Layer
+- **Drizzle ORM Package**: Established a pristine `@superhuman/database` module utilizing Drizzle ORM and `drizzle-kit`.
+- **Unified Schemas**: Modeled all system tables (including strict configurations for Corsair integration tables like `corsair_accounts` and `corsair_events`) and application specific tables (`users`, `email_summaries`) natively inside the database package.
+- **Service Decoupling**: Rerouted `corsair` and `inngest` logic to consume the standard DB exports (`db`, `pool`, `schema`) from the new package, eliminating standalone driver dependencies from the orchestration layer.
+
+## 5. AI & Inngest Integration
 - **Events Layer**: Extracted all Inngest configuration and type maps into a new `@superhuman/events` package, completely eliminating the circular dependency between `corsair` and `inngest`.
 - **AI SDK**: Validates `OPENAI_API_KEY` with Zod, and exports structured templates (`summarizeEmail`, `generateDraftReply`, `composeEmail`, `classifyEmail`, `rewriteInVoice`) running against `openai("gpt-4.1")` and the `generateText` helper from the Vercel AI SDK.
-- **Inngest Background Jobs**: Handles `gmail/message.received` by generating an email summary and draft reply, and `calendar/event.changed` by triggering a Slack notification via the Corsair integration. Both perfectly hook into the new native Corsair webhooks!
+- **Inngest Background Jobs**: Handles `gmail/message.received` by generating an email summary and draft reply. The generated AI draft is now persisted flawlessly to the Drizzle `emailSummaries` table!

@@ -1,6 +1,6 @@
 import { createCorsair } from "corsair";
 import { createCorsairDatabase } from "corsair/db";
-import { Pool } from "pg";
+import { pool } from "@superhuman/database";
 import { env } from "./env";
 import { inngestClient } from "@superhuman/events";
 
@@ -10,10 +10,6 @@ import { googlecalendar } from "@corsair-dev/googlecalendar";
 import { slack } from "@corsair-dev/slack";
 import { notion } from "@corsair-dev/notion";
 import { linear } from "@corsair-dev/linear";
-
-const pool = new Pool({
-  connectionString: env.DATABASE_URL,
-});
 
 /**
  * Singleton Corsair instance configured for self-hosted usage.
