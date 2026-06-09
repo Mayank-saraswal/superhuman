@@ -1,0 +1,22 @@
+{
+  "name": "@superhuman/ai",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.68",
+    "ai": "^6.0.198",
+    "dotenv": "^17.2.3",
+    "zod": "^4.3.5"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@superhuman/events",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "inngest": "^3.30.1",
+    "dotenv": "^17.2.3",
+    "zod": "^4.3.5"
+  }
+}

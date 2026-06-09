@@ -1,0 +1,22 @@
+{
+  "name": "@superhuman/inngest",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "inngest": "^3.19.0",
+    "@superhuman/events": "workspace:*",
+    "@superhuman/corsair": "workspace:*",
+    "@superhuman/ai": "workspace:*"
+  }
+}

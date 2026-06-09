@@ -1,14 +1,29 @@
 {
-  "name": "@repo/corsair",
+  "name": "@superhuman/corsair",
   "version": "1.0.0",
-  "scripts": {},
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@types/pg": "^8.11.11",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "corsair": "^0.1.75",
+    "@corsair-dev/mcp": "^0.1.0",
+    "@corsair-dev/gmail": "^0.1.0",
+    "@corsair-dev/googlecalendar": "^0.1.0",
+    "@corsair-dev/slack": "^0.1.0",
+    "@corsair-dev/notion": "^0.1.0",
+    "@corsair-dev/linear": "^0.1.0",
+    "pg": "^8.13.1",
+    "@superhuman/events": "workspace:*",
     "dotenv": "^17.2.3",
     "zod": "^4.3.5"
   }
