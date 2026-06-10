@@ -19,4 +19,4 @@ export const db = drizzle(pool, { schema });
 export * from "./schema";
 
 // Re-export standard Drizzle operators for query building
-export { eq, and, or, desc, asc, inArray, isNull, sql } from "drizzle-orm";
+export { eq, and, or, desc, asc, inArray, isNull, sql, ilike } from "drizzle-orm";

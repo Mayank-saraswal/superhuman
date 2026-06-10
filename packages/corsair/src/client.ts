@@ -1,5 +1,5 @@
 import { createCorsair } from "corsair";
-import { createCorsairDatabase } from "corsair/db";
+
 import { pool } from "@superhuman/database";
 import { env } from "./env";
 import { inngestClient } from "@superhuman/events";
@@ -15,7 +15,7 @@ import { linear } from "@corsair-dev/linear";
  * Singleton Corsair instance configured for self-hosted usage.
  */
 export const corsairClient = createCorsair({
-  database: createCorsairDatabase(pool),
+  database: pool,
   kek: env.CORSAIR_KEK,
   multiTenancy: true,
   plugins: [

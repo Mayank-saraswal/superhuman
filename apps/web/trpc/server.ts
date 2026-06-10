@@ -1,11 +1,20 @@
-import type { ServerRouter } from "@repo/trpc/client";
-import { createTRPCProxyClient } from "@repo/trpc/client";
-import { createTRPCHttpBatchClientClient } from "~/trpc/create-client";
+import "server-only";
 
-export const api = createTRPCProxyClient<ServerRouter>({
-  links: [createTRPCHttpBatchClientClient()],
-});
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { auth } from "@clerk/nextjs/server";
+import type { AppRouter } from "@superhuman/trpc/server";
 
-export const apiStreaming = createTRPCProxyClient<ServerRouter>({
-  links: [createTRPCHttpBatchClientClient({ enableStreaming: true })],
+export const api = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/trpc",
+      headers: async () => {
+        const { getToken } = await auth();
+        const token = await getToken();
+        return {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        };
+      },
+    }),
+  ],
 });

@@ -2,6 +2,7 @@ import { clerkClient, auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserByClerkId, upsertUser } from "@superhuman/services";
 import { Sidebar } from "~/components/layout/sidebar";
+import { CommandPalette } from "~/components/layout/CommandPalette";
 
 export default async function AppLayout({
   children,
@@ -40,11 +41,12 @@ export default async function AppLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0d1117] text-white">
+    <div className="flex h-screen overflow-hidden bg-background text-text-primary">
       <Sidebar />
       <main className="flex-1 overflow-y-auto">
         {children}
       </main>
+      <CommandPalette />
     </div>
   );
 }

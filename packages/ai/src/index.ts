@@ -1,4 +1,4 @@
-import { generateText } from "ai";
+import { generateText, streamText } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { env } from "./env";
 import * as prompts from "./prompts";
@@ -61,6 +61,17 @@ export async function composeEmail(bullets: string[], tone: string, voiceContext
 }
 
 /**
+ * Composes a full email based on bullets and tone (Streaming).
+ */
+export async function composeEmailStream(bullets: string[], tone: string, voiceContext: string): Promise<any> {
+  return streamText({
+    model: openai("gpt-4.1"),
+    system: prompts.COMPOSE_EMAIL_PROMPT,
+    prompt: `Tone: ${tone}\nVoice Context: ${voiceContext}\nBullets:\n${bullets.map((b) => "- " + b).join("\n")}`,
+  });
+}
+
+/**
  * Classifies an email into exactly one of: "important", "team", "vip", "marketing", "social".
  * @param {string} subject - The subject of the email.
  * @param {string} body - The body content of the email.
@@ -98,4 +109,15 @@ export async function rewriteInVoice(email: string, voiceContext: string): Promi
     prompt: `Voice Context: ${voiceContext}\n\nEmail:\n${email}`,
   });
   return text.trim();
+}
+
+/**
+ * Rewrites an email in the user's voice context (Streaming).
+ */
+export async function rewriteInVoiceStream(email: string, voiceContext: string): Promise<any> {
+  return streamText({
+    model: openai("gpt-4.1"),
+    system: prompts.REWRITE_PROMPT,
+    prompt: `Voice Context: ${voiceContext}\n\nEmail:\n${email}`,
+  });
 }

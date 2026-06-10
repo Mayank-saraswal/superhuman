@@ -1,10 +1,10 @@
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 
-import { type ServerRouter } from "../server";
+import { type AppRouter } from "../server";
 
-export type RouterOutputs = inferRouterOutputs<ServerRouter>;
-export type RouterInputs = inferRouterInputs<ServerRouter>;
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
+export type RouterInputs = inferRouterInputs<AppRouter>;
 
-export type { ServerRouter } from "../server";
+export type { AppRouter } from "../server";
 
 export * from "@trpc/client";

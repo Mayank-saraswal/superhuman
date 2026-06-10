@@ -29,7 +29,7 @@ export default function RootLayout({
         variables: { colorPrimary: '#388bfd', colorBackground: '#0d1117', colorText: '#e6edf3' }
       }}
     >
-      <html lang="en" className="dark">
+      <html lang="en" className="dark" suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
           <GlobalProviders>{children}</GlobalProviders>
         </body>

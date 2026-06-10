@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@superhuman/services": "workspace:*",
+    "@superhuman/database": "workspace:*",
+    "@superhuman/corsair": "workspace:*",
+    "@superhuman/ai": "workspace:*",
     "@clerk/nextjs": "7.4.3",
     "@clerk/backend": "3.5.0",
     "@trpc/client": "^11.8.1",

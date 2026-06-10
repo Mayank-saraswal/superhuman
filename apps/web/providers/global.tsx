@@ -6,23 +6,37 @@ import React, { useState } from "react";
 import { Toaster } from "~/components/ui/sonner";
 
 import { trpc } from "~/trpc/client";
-import { createTRPCHttpBatchClientClient } from "~/trpc/create-client";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnMount: true,
-      staleTime: Infinity,
-    },
-  },
-});
+import { httpBatchLink } from "@trpc/client";
+import { useAuth } from "@clerk/nextjs";
 
 export const GlobalProviders: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { getToken } = useAuth();
+  
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnMount: true,
+        staleTime: Infinity,
+      },
+    },
+  }));
+
   const [trpcClient] = useState(() =>
     trpc.createClient({
-      links: [createTRPCHttpBatchClientClient()],
-    }),
+      links: [
+        httpBatchLink({
+          url: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/trpc",
+          async headers() {
+            const token = await getToken();
+            return {
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            };
+          },
+        }),
+      ],
+    })
   );
+
   return (
     <QueryClientProvider client={queryClient}>
       <NextThemesProvider

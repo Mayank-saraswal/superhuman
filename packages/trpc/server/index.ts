@@ -1,12 +1,5 @@
-import { router } from "./trpc";
-
-import { healthRouter } from "./routes/health/route";
-import { authRouter } from "./routes/auth/route";
-
-export const serverRouter = router({
-  health: healthRouter,
-  auth: authRouter,
-});
+export { appRouter } from "./routers";
+export type { AppRouter } from "./routers";
 
 export { createContext } from "./context";
-export type ServerRouter = typeof serverRouter;
+export { publicProcedure, protectedProcedure, onboardedProcedure } from "./procedures";
