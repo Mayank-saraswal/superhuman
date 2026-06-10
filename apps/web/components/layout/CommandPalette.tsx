@@ -14,6 +14,8 @@ export function CommandPalette() {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setOpen((open) => !open);
+      } else if (e.key === "Escape" || e.key === "Esc") {
+        setOpen(false);
       }
     };
 

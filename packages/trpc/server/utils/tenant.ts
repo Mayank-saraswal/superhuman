@@ -15,6 +15,7 @@ export async function getTenant(clerkId: string) {
     return corsairClient.withTenant(user.corsairTenantId);
   } catch (error) {
     if (error instanceof TRPCError) throw error;
-    throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+    const message = error instanceof Error ? error.message : "Unknown error";
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: `Failed to fetch user: ${message}` });
   }
 }

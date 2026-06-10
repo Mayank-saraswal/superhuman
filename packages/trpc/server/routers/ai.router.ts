@@ -79,19 +79,16 @@ export const aiRouter = router({
 
       const draftReply = await generateDraftReply(subject, body, from, voiceContext);
 
-      // Save to db
-      if (existing.length > 0 && existing[0]) {
-        await db.update(emailSummaries)
-          .set({ draftReply })
-          .where(eq(emailSummaries.id, existing[0].id));
-      } else {
-        await db.insert(emailSummaries).values({
-          userId: ctx.user.id,
-          gmailMessageId: input.messageId,
-          summary: "Auto-generated summary missing",
-          draftReply
-        });
-      }
+      // Save to db using upsert
+      await db.insert(emailSummaries).values({
+        userId: ctx.user.id,
+        gmailMessageId: input.messageId,
+        summary: "Auto-generated summary missing",
+        draftReply
+      }).onConflictDoUpdate({
+        target: [emailSummaries.userId, emailSummaries.gmailMessageId],
+        set: { draftReply }
+      });
 
       return { draftReply };
     })

@@ -2,7 +2,7 @@
 
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Mail, Calendar, FileText, Zap, Search, Settings } from "lucide-react";
 import { cn } from "~/lib/utils";
 
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <aside className="w-[220px] shrink-0 border-r border-border bg-background flex flex-col h-full">
@@ -40,7 +41,11 @@ export function Sidebar() {
           <span className="font-mono text-[10px] bg-border px-1.5 py-0.5 rounded-sm">⌘K</span>
         </button>
 
-        <button className="w-full h-9 rounded-md bg-accent text-background font-serif font-semibold hover:bg-accent-hover transition-colors flex items-center justify-center gap-2">
+        <button 
+          type="button"
+          onClick={() => router.push('/mail/compose')}
+          className="w-full h-9 rounded-md bg-accent text-background font-serif font-semibold hover:bg-accent-hover transition-colors flex items-center justify-center gap-2"
+        >
           Compose
           <span className="font-mono text-[10px] bg-black/10 px-1.5 py-0.5 rounded-sm ml-1 text-background">C</span>
         </button>

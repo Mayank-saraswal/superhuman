@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().describe("DB URL").default("postgres://postgres:postgres@localhost:5432/postgres"),
+  DATABASE_URL: z.string().describe("DB URL"),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {
@@ -11,7 +11,7 @@ function createEnv(env: NodeJS.ProcessEnv) {
     if (process.env.NODE_ENV === "production" && !process.env.CI) {
       throw new Error(safeParseResult.error.message);
     }
-    return { DATABASE_URL: "postgres://postgres:postgres@localhost:5432/postgres" };
+    return { DATABASE_URL: process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/postgres" };
   }
   return safeParseResult.data;
 }

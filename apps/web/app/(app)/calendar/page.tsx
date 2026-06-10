@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
 
@@ -6,7 +8,7 @@ export default function CalendarPage() {
     <div className="flex flex-col h-full bg-background relative">
       <div className="flex items-center justify-between p-4 border-b border-border shrink-0">
         <h1 className="font-serif text-[18px] font-bold text-text-primary">Calendar</h1>
-        <Button className="bg-accent text-[#1C1C1C] hover:bg-accent-hover font-sans text-[13px] h-8 px-4 font-medium">
+        <Button onClick={() => alert('Not implemented yet')} className="bg-accent text-[#1C1C1C] hover:bg-accent-hover font-sans text-[13px] h-8 px-4 font-medium">
           + New Event
         </Button>
       </div>

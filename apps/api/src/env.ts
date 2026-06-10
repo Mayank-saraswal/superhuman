@@ -2,14 +2,14 @@ import { z } from "zod";
 
 const envSchema = z.object({
   PORT: z.string().optional(),
-  NODE_ENV: z.enum(["development", "prod"]).default("development"),
+  NODE_ENV: z.enum(["development", "production"]).default("development"),
   BASE_URL: z.string().default("http://localhost:8000"),
   CLERK_SECRET_KEY: z.string(),
   DATABASE_URL: z.string(),
   CORSAIR_KEK: z.string(),
   INNGEST_EVENT_KEY: z.string().optional(),
   INNGEST_SIGNING_KEY: z.string().optional(),
-  CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  CORS_ORIGIN: z.string(),
 });
 
 function createEnv(env: NodeJS.ProcessEnv) {

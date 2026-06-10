@@ -32,16 +32,26 @@ export const settingsRouter = router({
         };
       }
 
-      return {
-        hasGmail: true,
-        hasGoogleCalendar: true,
-        hasSlack: true
-      };
+      try {
+        const tenant = corsairClient.withTenant(ctx.user.corsairTenantId);
+        return {
+          hasGmail: !!tenant.gmail,
+          hasGoogleCalendar: !!tenant.googlecalendar,
+          hasSlack: !!tenant.slack
+        };
+      } catch (err) {
+        console.error("Failed to fetch integrations", err);
+        return { hasGmail: false, hasGoogleCalendar: false, hasSlack: false };
+      }
     }),
 
   getConnectLink: protectedProcedure
-    .query(async ({ ctx }) => {
-      const url = `https://corsair.dev/connect?tenantId=${ctx.user.corsairTenantId || ctx.user.clerkId}`;
+    .input(z.object({ provider: z.string().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      let url = `https://corsair.dev/connect?tenantId=${ctx.user.corsairTenantId || ctx.user.clerkId}`;
+      if (input?.provider) {
+        url += `&provider=${input.provider}`;
+      }
       return { url };
     }),
 

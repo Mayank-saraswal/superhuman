@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, jsonb, uuid, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, boolean, jsonb, uuid, index, unique } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -38,7 +38,9 @@ export const emailSummaries = pgTable("email_summaries", {
   draftReply: text("draft_reply"),
   classification: text("classification"),
   createdAt: timestamp("created_at").defaultNow(),
-});
+}, (table) => [
+  unique("email_summaries_user_msg_unique").on(table.userId, table.gmailMessageId),
+]);
 
 export const emailSummariesRelations = relations(emailSummaries, ({ one }) => ({
   user: one(users, {

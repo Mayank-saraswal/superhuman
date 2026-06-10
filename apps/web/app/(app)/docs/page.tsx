@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { Button } from "~/components/ui/button";
 
@@ -7,7 +9,7 @@ export default function DocsPage() {
       <div className="w-[200px] shrink-0 border-r border-border flex flex-col h-full bg-background">
         <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
           <h2 className="font-serif font-bold text-[16px] text-text-primary">My Docs</h2>
-          <Button variant="ghost" size="icon-sm" className="h-7 w-7 text-text-secondary hover:text-text-primary">
+          <Button onClick={() => alert('Not implemented yet')} variant="ghost" size="icon-sm" className="h-7 w-7 text-text-secondary hover:text-text-primary">
             +
           </Button>
         </div>

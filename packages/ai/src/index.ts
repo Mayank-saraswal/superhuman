@@ -1,4 +1,4 @@
-import { generateText, streamText } from "ai";
+import { generateText, streamText, StreamTextResult } from "ai";
 import { openai } from "@ai-sdk/openai";
 import { env } from "./env";
 import * as prompts from "./prompts";
@@ -63,7 +63,7 @@ export async function composeEmail(bullets: string[], tone: string, voiceContext
 /**
  * Composes a full email based on bullets and tone (Streaming).
  */
-export async function composeEmailStream(bullets: string[], tone: string, voiceContext: string): Promise<any> {
+export async function composeEmailStream(bullets: string[], tone: string, voiceContext: string): Promise<StreamTextResult<any, any>> {
   return streamText({
     model: openai("gpt-4.1"),
     system: prompts.COMPOSE_EMAIL_PROMPT,
@@ -114,7 +114,7 @@ export async function rewriteInVoice(email: string, voiceContext: string): Promi
 /**
  * Rewrites an email in the user's voice context (Streaming).
  */
-export async function rewriteInVoiceStream(email: string, voiceContext: string): Promise<any> {
+export async function rewriteInVoiceStream(email: string, voiceContext: string): Promise<StreamTextResult<any, any>> {
   return streamText({
     model: openai("gpt-4.1"),
     system: prompts.REWRITE_PROMPT,

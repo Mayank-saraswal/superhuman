@@ -3,7 +3,7 @@ import { router } from "../trpc";
 import { protectedProcedure } from "../procedures";
 import { getTenant } from "../utils/tenant";
 import { TRPCError } from "@trpc/server";
-import { db, followUps, emailSummaries, eq, and } from "@superhuman/database";
+import { db, followUps, emailSummaries, eq, and, inArray } from "@superhuman/database";
 
 export const mailRouter = router({
   getInbox: protectedProcedure
@@ -25,13 +25,9 @@ export const mailRouter = router({
         // Find summaries for these messages
         const dbSummaries = await db.select().from(emailSummaries).where(and(
           eq(emailSummaries.userId, ctx.user.id),
-          // We can't do an IN clause easily if there are too many, but for 50 it's fine.
-          // For simplicity, we just fetch summaries one by one or leave it for later.
-          // Wait, Drizzle has `inArray`. Let's assume we use standard queries or skip joining for now if it's too complex.
-          // Actually, let's just fetch them.
+          inArray(emailSummaries.gmailMessageId, messageIds)
         ));
         
-        // This is a naive fetch all summaries for user. In a real app, use inArray(emailSummaries.gmailMessageId, messageIds)
         dbSummaries.forEach(s => {
           summaries[s.gmailMessageId] = s;
         });
@@ -74,12 +70,12 @@ export const mailRouter = router({
 
   sendEmail: protectedProcedure
     .input(z.object({
-      to: z.string(),
-      subject: z.string(),
+      to: z.string().email(),
+      subject: z.string().min(1, "Subject is required").refine(val => !/[\r\n]/.test(val), "CRLF injection detected"),
       body: z.string(),
-      cc: z.string().optional(),
-      bcc: z.string().optional(),
-      replyToMessageId: z.string().optional()
+      cc: z.string().optional().refine(val => !val || !/[\r\n]/.test(val), "CRLF injection detected"),
+      bcc: z.string().optional().refine(val => !val || !/[\r\n]/.test(val), "CRLF injection detected"),
+      replyToMessageId: z.string().optional().refine(val => !val || !/[\r\n]/.test(val), "CRLF injection detected")
     }))
     .mutation(async ({ ctx, input }) => {
       const tenant = await getTenant(ctx.user.clerkId);
@@ -137,7 +133,13 @@ export const mailRouter = router({
     }),
 
   setFollowUp: protectedProcedure
-    .input(z.object({ messageId: z.string(), remindAt: z.string() }))
+    .input(z.object({ 
+      messageId: z.string(), 
+      remindAt: z.string().refine(date => {
+        const d = new Date(date);
+        return !isNaN(d.getTime()) && d > new Date();
+      }, "Must be a valid future date")
+    }))
     .mutation(async ({ ctx, input }) => {
       await db.insert(followUps).values({
         userId: ctx.user.id,

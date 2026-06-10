@@ -17,8 +17,7 @@ export default function ConnectPage() {
     refetchInterval: 3000,
   });
 
-  // It's a query, we just fetch the link on mount
-  const { data: connectLink } = trpc.settings.getConnectLink.useQuery();
+  const utils = trpc.useUtils();
 
   const completeOnboarding = trpc.settings.completeOnboarding.useMutation({
     onSuccess: () => {
@@ -34,8 +33,9 @@ export default function ConnectPage() {
 
   const handleConnect = async (provider: string) => {
     try {
-      if (connectLink?.url) {
-        window.open(connectLink.url, "_blank");
+      const data = await utils.settings.getConnectLink.fetch({ provider });
+      if (data?.url) {
+        window.open(data.url, "_blank");
       }
     } catch (err) {
       console.error("Failed to connect", err);

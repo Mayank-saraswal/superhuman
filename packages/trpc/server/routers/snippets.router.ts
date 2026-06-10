@@ -46,8 +46,9 @@ export const snippetsRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "Snippet not found or unauthorized" });
       }
 
+      const { id, ...updateFields } = input;
       const result = await db.update(snippets).set({
-        ...input,
+        ...updateFields,
       }).where(eq(snippets.id, input.id)).returning();
 
       return result[0];

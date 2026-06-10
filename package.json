@@ -9,7 +9,7 @@
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
-    "ngrok:dev": "ngrok http --url=vast-lemur-notable.ngrok-free.app 3000"
+    "ngrok:dev": "ngrok http --url=${NGROK_URL:-your-domain.ngrok-free.app} 3000"
   },
   "devDependencies": {
     "prettier": "^3.7.4",

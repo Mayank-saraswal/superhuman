@@ -36,7 +36,11 @@ export default async function AppLayout({
     }
   }
 
-  if (!user || user.onboardingComplete === false) {
+  if (!user) {
+    throw new Error("Unable to verify user record. Please try logging out and logging back in.");
+  }
+
+  if (user.onboardingComplete === false) {
     redirect("/onboarding/connect");
   }
 

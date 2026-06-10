@@ -34,7 +34,7 @@ export async function handleCorsairWebhook(req: Request, res: Response) {
 
     return res.status(response.status).json(response.body);
   } catch (error) {
-    console.error("Error handling Corsair webhook:", error);
+    console.error("Error handling Corsair webhook:", error instanceof Error ? error.message : "Unknown error");
     return res.status(500).json({ error: "Internal Server Error" });
   }
 }

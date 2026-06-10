@@ -102,7 +102,7 @@ export default function GoChatPage() {
                 handleSend();
               }
             }}
-            placeholder="Ask Go to do something... (⌘ Enter to send)"
+            placeholder="Ask Go to do something... (Enter or ⌘/Ctrl+Enter to send)"
             className="w-full bg-surface border border-border rounded-[10px] px-4 py-4 pr-12 font-sans text-[15px] text-text-primary placeholder:text-text-muted focus:outline-none focus:border-white/40 transition-colors"
           />
           <button 

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
 import Image from "next/image";
 import DOMPurify from "isomorphic-dompurify";
 import { formatDistanceToNow } from "date-fns";
@@ -25,6 +26,35 @@ export default function MailInbox() {
     { threadId: selectedThreadId! },
     { enabled: !!selectedThreadId }
   );
+
+  const archiveEmail = trpc.mail.archiveEmail.useMutation({
+    onSuccess: () => {
+      toast.success("Email archived");
+      setSelectedThreadId(null);
+    }
+  });
+
+  const starEmail = trpc.mail.starEmail.useMutation({
+    onSuccess: () => {
+      toast.success("Email starred");
+    }
+  });
+
+  const sendEmail = trpc.mail.sendEmail.useMutation({
+    onSuccess: () => {
+      toast.success("Email sent!");
+      setSelectedThreadId(null);
+    }
+  });
+
+  const [editedDraft, setEditedDraft] = useState("");
+  const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (threadData?.draftReply) {
+      setEditedDraft(threadData.draftReply);
+    }
+  }, [threadData?.draftReply]);
 
   return (
     <div className="flex h-full w-full bg-background overflow-hidden">
@@ -69,8 +99,8 @@ export default function MailInbox() {
               {inbox?.messages?.map((msg) => {
                 const isSelected = selectedThreadId === msg.threadId;
                 const isUnread = true; // In real app, check labelIds includes UNREAD
-                const subject = msg.payload?.headers?.find(h => h.name === "Subject")?.value || "No Subject";
-                const fromHeader = msg.payload?.headers?.find(h => h.name === "From")?.value || "Unknown";
+                const subject = msg.payload?.headers?.find((h: any) => h.name === "Subject")?.value || "No Subject";
+                const fromHeader = msg.payload?.headers?.find((h: any) => h.name === "From")?.value || "Unknown";
                 const fromName = (fromHeader.split("<")[0] || "Unknown").replace(/"/g, "").trim();
                 
                 return (
@@ -91,7 +121,9 @@ export default function MailInbox() {
                         {fromName}
                       </span>
                       <span className="font-mono text-[11px] text-text-muted shrink-0">
-                        {msg.internalDate ? formatDistanceToNow(parseInt(msg.internalDate), { addSuffix: true }) : ""}
+                        {msg.internalDate && !Number.isNaN(parseInt(msg.internalDate)) 
+                          ? formatDistanceToNow(parseInt(msg.internalDate), { addSuffix: true }) 
+                          : ""}
                       </span>
                     </div>
                     <div className="font-sans text-[13px] text-text-primary truncate mb-1">
@@ -132,13 +164,19 @@ export default function MailInbox() {
             <div className="p-6 pb-4 border-b border-border shrink-0">
               <div className="flex items-start justify-between gap-4 mb-6">
                 <h1 className="font-serif text-[22px] font-bold text-text-primary leading-tight">
-                  {threadData.thread.messages?.[0]?.payload?.headers?.find(h => h.name === "Subject")?.value || "No Subject"}
+                  {threadData.thread.messages?.[0]?.payload?.headers?.find((h: any) => h.name === "Subject")?.value || "No Subject"}
                 </h1>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary"><Reply className="size-4" /></Button>
+                  <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary" onClick={() => replyTextareaRef.current?.focus()}><Reply className="size-4" /></Button>
                   <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary"><Forward className="size-4" /></Button>
-                  <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary"><Archive className="size-4" /></Button>
-                  <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary"><Star className="size-4" /></Button>
+                  <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary" onClick={() => {
+                    const msgId = threadData?.thread?.messages?.[0]?.id;
+                    if (msgId) archiveEmail.mutate({ messageId: msgId });
+                  }}><Archive className="size-4" /></Button>
+                  <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary" onClick={() => {
+                    const msgId = threadData?.thread?.messages?.[0]?.id;
+                    if (msgId) starEmail.mutate({ messageId: msgId, starred: true });
+                  }}><Star className="size-4" /></Button>
                   <Button variant="ghost" size="icon-sm" className="text-text-secondary hover:text-text-primary"><MoreHorizontal className="size-4" /></Button>
                 </div>
               </div>
@@ -160,8 +198,8 @@ export default function MailInbox() {
             {/* Messages in Thread */}
             <div className="flex-1 p-6 space-y-12">
               {threadData.thread.messages?.map((msg, idx) => {
-                const fromHeader = msg.payload?.headers?.find(h => h.name === "From")?.value || "";
-                const dateHeader = msg.payload?.headers?.find(h => h.name === "Date")?.value || "";
+                const fromHeader = msg.payload?.headers?.find((h: any) => h.name === "From")?.value || "";
+                const dateHeader = msg.payload?.headers?.find((h: any) => h.name === "Date")?.value || "";
                 
                 // Very basic fallback HTML extraction
                 let htmlBody = msg.snippet; 
@@ -190,14 +228,31 @@ export default function MailInbox() {
                   <Edit className="size-3.5 text-text-muted" />
                 </div>
                 <textarea 
+                  ref={replyTextareaRef}
                   className="w-full bg-background border border-border rounded-md p-3 font-sans text-[14px] text-text-primary mb-3 focus:outline-none focus:border-white/40"
                   rows={3}
-                  defaultValue={threadData.draftReply}
+                  value={editedDraft}
+                  onChange={(e) => setEditedDraft(e.target.value)}
                 />
                 <div className="flex items-center gap-3">
-                  <Button className="bg-[#4ADE80] text-[#1C1C1C] hover:bg-[#4ADE80]/90">Send This</Button>
-                  <Button variant="ghost">Edit</Button>
-                  <button className="text-text-muted hover:text-text-primary text-[13px] ml-auto">Discard</button>
+                  <Button 
+                    className="bg-[#4ADE80] text-[#1C1C1C] hover:bg-[#4ADE80]/90"
+                    disabled={sendEmail.isPending}
+                    onClick={() => {
+                      const msgId = threadData?.thread?.messages?.[threadData.thread.messages.length - 1]?.id;
+                      if (!msgId) return;
+                      sendEmail.mutate({
+                        to: "recipient@example.com", // In real app, extract from message headers
+                        subject: "Re: " + (threadData.thread.messages?.[0]?.payload?.headers?.find((h: any) => h.name === "Subject")?.value || ""),
+                        body: editedDraft,
+                        replyToMessageId: msgId
+                      });
+                    }}
+                  >
+                    {sendEmail.isPending ? "Sending..." : "Send This"}
+                  </Button>
+                  <Button variant="ghost" onClick={() => replyTextareaRef.current?.focus()}>Edit</Button>
+                  <button className="text-text-muted hover:text-text-primary text-[13px] ml-auto" onClick={() => setEditedDraft("")}>Discard</button>
                 </div>
               </div>
             )}
