@@ -4,8 +4,10 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
+      "@/*": ["./*"],
       "@superhuman/services": ["../../packages/services/index.ts"],
-      "@superhuman/database": ["../../packages/database/src/index.ts"]
+      "@superhuman/database": ["../../packages/database/src/index.ts"],
+      "@superhuman/corsair": ["../../packages/corsair/src/index.ts"]
     },
     "plugins": [
       {

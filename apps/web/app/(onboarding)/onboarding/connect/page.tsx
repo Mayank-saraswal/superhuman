@@ -17,8 +17,6 @@ export default function ConnectPage() {
     refetchInterval: 3000,
   });
 
-  const utils = trpc.useUtils();
-
   const completeOnboarding = trpc.settings.completeOnboarding.useMutation({
     onSuccess: () => {
       router.push("/onboarding/complete");
@@ -31,15 +29,10 @@ export default function ConnectPage() {
     }
   }, [integrations]);
 
-  const handleConnect = async (provider: string) => {
-    try {
-      const data = await utils.settings.getConnectLink.fetch({ provider });
-      if (data?.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch (err) {
-      console.error("Failed to connect", err);
-    }
+  const handleConnect = (provider: string) => {
+    // Kick off the Corsair OAuth flow (sets a signed-state cookie, then
+    // redirects to the provider and back to /api/auth).
+    window.location.href = `/api/connect?plugin=${encodeURIComponent(provider)}`;
   };
 
   return (
@@ -81,7 +74,7 @@ export default function ConnectPage() {
                 Connected
               </div>
             ) : (
-              <Button variant="default" onClick={() => handleConnect("gmail")} className="h-8 px-4 text-[13px]">
+              <Button variant="solid" onClick={() => handleConnect("gmail")} className="h-8 px-4 text-[13px]">
                 Connect →
               </Button>
             )}
@@ -96,7 +89,7 @@ export default function ConnectPage() {
                 <p className="font-sans text-[13px] text-text-secondary">Manage your schedule and meetings</p>
               </div>
             </div>
-            <Button variant="default" onClick={() => handleConnect("googlecalendar")} className="h-8 px-4 text-[13px]">
+            <Button variant="solid" onClick={() => handleConnect("googlecalendar")} className="h-8 px-4 text-[13px]">
               Connect →
             </Button>
           </div>
@@ -110,7 +103,7 @@ export default function ConnectPage() {
                 <p className="font-sans text-[13px] text-text-secondary">Send messages and notifications</p>
               </div>
             </div>
-            <Button variant="default" onClick={() => handleConnect("slack")} className="h-8 px-4 text-[13px]">
+            <Button variant="solid" onClick={() => handleConnect("slack")} className="h-8 px-4 text-[13px]">
               Connect →
             </Button>
           </div>

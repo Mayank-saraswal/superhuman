@@ -3,36 +3,49 @@ import type { Request, Response } from "express";
 
 /**
  * Handles incoming webhooks from Corsair.
- * Important: This route MUST receive the raw body (or a Buffer) to verify signatures correctly in production if Corsair uses signatures.
- * Note: express.raw({ type: "application/json" }) is already configured in server.ts specifically for this route
- * to ensure signature verification works.
- * Since Corsair's `webhookHandler` handles signature verifications, we pass req.headers and req.body.
+ *
+ * The route is mounted with `express.raw({ type: "application/json" })` in
+ * server.ts so `req.body` arrives as a Buffer — this preserves the exact bytes
+ * needed for any signature verification Corsair performs internally.
+ *
+ * Multi-tenant routing relies on the `?tenantId=<id>` query param that we
+ * include when registering webhooks with each provider.
  */
 export async function handleCorsairWebhook(req: Request, res: Response) {
   try {
-    const tenantId = req.query.tenant as string;
-    if (!tenantId) {
-      return res.status(400).json({ error: "Missing tenant query parameter" });
-    }
-
-    // Safely parse headers to Record<string, string>
-    const safeHeaders: Record<string, string> = {};
+    // Normalize headers to a plain string map.
+    const headers: Record<string, string> = {};
     for (const [key, value] of Object.entries(req.headers)) {
       if (typeof value === "string") {
-        safeHeaders[key] = value;
+        headers[key] = value;
       } else if (Array.isArray(value)) {
-        safeHeaders[key] = value.join(",");
+        headers[key] = value.join(",");
       }
     }
 
-    // Call the Corsair SDK's webhook handler
-    const response = await webhookHandler({
-      headers: safeHeaders,
-      body: req.body, // express.raw() ensures this is a Buffer
-      tenantId
+    // Normalize query params (Corsair reads `tenantId` from here).
+    const query: Record<string, string | undefined> = {};
+    for (const [key, value] of Object.entries(req.query)) {
+      if (typeof value === "string") {
+        query[key] = value;
+      } else if (Array.isArray(value) && typeof value[0] === "string") {
+        query[key] = value[0] as string;
+      }
+    }
+
+    const result = await webhookHandler({
+      headers,
+      body: req.body, // Buffer thanks to express.raw()
+      query,
     });
 
-    return res.status(response.status).json(response.body);
+    if (result.headers) {
+      for (const [key, value] of Object.entries(result.headers)) {
+        res.setHeader(key, value);
+      }
+    }
+
+    return res.status(result.status).json(result.body);
   } catch (error) {
     console.error("Error handling Corsair webhook:", error instanceof Error ? error.message : "Unknown error");
     return res.status(500).json({ error: "Internal Server Error" });

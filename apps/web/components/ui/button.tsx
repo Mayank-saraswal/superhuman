@@ -9,7 +9,20 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-accent text-[#1C1C1C] hover:bg-accent-hover font-sans font-medium",
+        solid: "bg-accent text-[#1C1C1C] hover:bg-accent-hover font-sans font-medium",
+        glass: cn(
+          "relative isolate text-foreground border border-white/30 dark:border-white/10",
+          "bg-white/10 dark:bg-white/5",
+          "shadow-[0_8px_32px_-8px_rgba(0,0,0,0.25)]",
+          "[backdrop-filter:blur(8px)_saturate(180%)_url(#liquid-glass-distortion)]",
+          "[-webkit-backdrop-filter:blur(8px)_saturate(180%)]",
+          "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-[inherit]",
+          "before:bg-gradient-to-b before:from-white/40 before:to-white/0 before:opacity-50",
+          "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit]",
+          "after:shadow-[inset_0_1px_1px_rgba(255,255,255,0.75),inset_0_-1px_2px_rgba(0,0,0,0.15)]",
+          "hover:bg-white/20 hover:dark:bg-white/10 hover:shadow-[0_8px_32px_-6px_rgba(0,0,0,0.3)]",
+          "focus-visible:ring-white/60"
+        ),
         destructive: "bg-danger text-[#1C1C1C] hover:bg-danger/90",
         outline: "bg-transparent text-text-primary border border-white/20 hover:border-white/50",
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
@@ -26,7 +39,7 @@ const buttonVariants = cva(
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "glass",
       size: "default",
     },
   }
@@ -34,7 +47,7 @@ const buttonVariants = cva(
 
 function Button({
   className,
-  variant = "default",
+  variant = "glass",
   size = "default",
   asChild = false,
   ...props

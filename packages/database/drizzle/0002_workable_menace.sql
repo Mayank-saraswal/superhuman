@@ -1,0 +1,1 @@
+ALTER TABLE "email_summaries" ADD CONSTRAINT "email_summaries_user_msg_unique" UNIQUE("user_id","gmail_message_id");

@@ -1,40 +1,60 @@
 import { processWebhook } from "corsair";
 import { corsairClient } from "./client";
 
+export interface WebhookRequest {
+  /** Incoming HTTP headers, normalized to a string map. */
+  headers: Record<string, string>;
+  /** Raw or parsed request body. Strings/Buffers are JSON-parsed when possible. */
+  body: unknown;
+  /** Query string params. `tenantId` is used by Corsair for multi-tenant routing. */
+  query?: Record<string, string | undefined>;
+}
+
+export interface WebhookHandlerResult {
+  status: number;
+  body: unknown;
+  headers?: Record<string, string>;
+}
+
 /**
- * Handles incoming webhooks from Corsair plugins and routes them.
- * The internal routing and hooks are configured in the corsairClient.
- * 
- * @param {Request} request - The incoming standard web Request object.
- * @returns {Promise<Response>} The HTTP Response.
+ * Framework-agnostic webhook handler for incoming Corsair plugin events.
+ *
+ * Pass the request's headers, body, and query (including `?tenantId=...` for
+ * multi-tenant routing). Internal routing and the messageChanged / onEventChanged
+ * hooks are configured on the corsairClient.
  */
-export async function webhookHandler(request: Request): Promise<Response> {
-  const headers = Object.fromEntries(request.headers.entries());
-  
-  // Try parsing the body, but fallback to raw text if it's not JSON
-  let body: any;
-  let rawText = "";
-  try {
-    rawText = await request.text();
-    body = JSON.parse(rawText);
-  } catch {
-    body = rawText;
+export async function webhookHandler(req: WebhookRequest): Promise<WebhookHandlerResult> {
+  // Normalize the body: Corsair's processWebhook accepts a string or object.
+  let body: unknown = req.body;
+  if (Buffer.isBuffer(body)) {
+    body = body.toString("utf8");
+  }
+  if (typeof body === "string") {
+    try {
+      body = JSON.parse(body);
+    } catch {
+      // leave as raw string; processWebhook can still match by headers
+    }
   }
 
-  // Get the URL search params if any
-  const url = new URL(request.url);
-  const query = Object.fromEntries(url.searchParams.entries());
+  const query = req.query ?? {};
 
-  // Use the corsair processWebhook helper to handle the routing
-  const result = await processWebhook(corsairClient, headers, body, query);
+  const result = await processWebhook(
+    corsairClient as any,
+    req.headers,
+    body as any,
+    query as any
+  );
 
   if (!result.plugin) {
-    // If no plugin matched, just return 200 OK to acknowledge the webhook safely
-    return new Response("OK", { status: 200 });
+    // No plugin matched — acknowledge so the provider doesn't retry forever.
+    return { status: 200, body: { ok: true } };
   }
 
-  return new Response(JSON.stringify(result.response?.returnToSender || {}), { 
-    status: result.response?.statusCode || (result.response?.success === false ? 500 : 200),
-    headers: result.responseHeaders
-  });
+  const response = result.response;
+  return {
+    status: response?.statusCode ?? (response?.success === false ? 500 : 200),
+    body: response?.returnToSender ?? { ok: true },
+    headers: result.responseHeaders,
+  };
 }

@@ -23,7 +23,7 @@ const openApiDocument = generateOpenApiDocument(appRouter, {
 // Configure CORS
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: [env.CORS_ORIGIN || "http://localhost:3000", "https://vast-lemur-notable.ngrok-free.app"],
     credentials: true,
   })
 );
